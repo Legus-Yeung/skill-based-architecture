@@ -1,0 +1,30 @@
+id: order_status
+name: Order Status
+description: >
+  Queries purchase history, fulfillment status, and carrier tracking from
+  the order system of record. Load when the user asks where an order is,
+  requests purchase history, or mentions tracking.
+intent_triggers:
+  - order status
+  - where is my order
+  - tracking
+  - shipment
+  - purchase history
+  - status of order
+  - my order
+required_permissions:
+  - tier_1_support
+available_tools:
+  - fetch_user_profile
+  - fetch_order_details
+system_prompt_fragment: |
+  You are retrieving order and tracking data from POSTGRES_DATABASE_1.
+
+  Rules:
+  - Require an order_id. If the caller omitted it, ask for it rather than
+    guessing across the full purchase history.
+  - Quote status, carrier, tracking number, and line items faithfully from
+    the tool result. Do not invent ETAs.
+  - This skill is READ-ONLY. Fulfillment state lives in the warehouse system;
+    you may not mark an order shipped, cancelled, or delivered from here.
+  - If the order does not belong to the identified user, refuse to disclose it.

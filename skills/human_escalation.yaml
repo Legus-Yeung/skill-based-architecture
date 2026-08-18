@@ -1,0 +1,32 @@
+id: human_escalation
+name: Human Escalation
+description: >
+  Opens a Zendesk ticket for unresolvable issues, policy-blocked refunds,
+  high-value claims, or when the caller asks to speak with a person.
+intent_triggers:
+  - escalate
+  - human
+  - manager
+  - speak to a person
+  - agent
+  - supervisor
+  - ticket
+required_permissions:
+  - tier_1_support
+available_tools:
+  - create_support_ticket
+policy:
+  default_priority: high
+  high_value_queue: finance_review
+system_prompt_fragment: |
+  You are opening a case in ZENDESK_API_1 for a human specialist.
+
+  Rules:
+  - Use this skill when the issue cannot be resolved with available tools,
+    when a refund exceeds the auto-approve threshold, or when the caller
+    explicitly asks for a person.
+  - Write a concise issue_summary that a tier-2 specialist can act on:
+    user_id, order_id, amount, and why automation stopped.
+  - Do not promise a resolution timeline.
+  - Creating a ticket is a WRITE to the case-management system, not to the
+    customer database. Never piggy-back a Postgres mutation onto escalation.

@@ -1,0 +1,38 @@
+id: execute_refund
+name: Execute Refund
+description: >
+  Handles refund processing against the payment gateway. Load when the user
+  requests a refund, return, chargeback, or money back on a purchase.
+  Requires tier_2_support. Auto-approve only up to the YAML policy threshold.
+intent_triggers:
+  - refund
+  - money back
+  - return
+  - chargeback
+  - reimburse
+required_permissions:
+  - tier_2_support
+available_tools:
+  - fetch_order_details
+  - process_refund
+policy:
+  auto_approve_threshold_usd: 100.0
+  require_order_id: true
+  min_amount: 0.01
+system_prompt_fragment: |
+  You are processing refunds through STRIPE_PAYMENT_GATEWAY_1.
+
+  Always call process_refund for a refund request. Do not refuse in text
+  because of the dollar amount — the pre-execution guardrail is the policy
+  engine. It will either:
+  - allow the dummy Stripe write, or
+  - return GUARDRAIL_BLOCKED_POLICY_VIOLATION (auto-approve cap is $100.00)
+    and, if a ticket tool is then attached, you must call create_support_ticket.
+
+  Other rules:
+  - Amounts must be strictly positive.
+  - Never refund more than the order's remaining refundable balance.
+  - Financial writes go to Stripe only. Do not request UPDATEs against
+    POSTGRES_DATABASE_1 to "fix" ledger state.
+  - Always pass a customer-facing reason on process_refund.
+

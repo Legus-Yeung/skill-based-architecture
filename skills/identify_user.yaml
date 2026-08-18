@@ -1,0 +1,26 @@
+id: identify_user
+name: Identify User
+description: >
+  Verifies the caller's identity against the customer system of record.
+  Load when a session starts, when the user asks who they are, or whenever
+  a downstream skill needs a confirmed profile before acting.
+always_load: false
+intent_triggers:
+  - who am i
+  - my account
+  - verify identity
+  - identify
+  - profile
+required_permissions:
+  - tier_1_support
+available_tools:
+  - fetch_user_profile
+system_prompt_fragment: |
+  You are performing identity verification against POSTGRES_DATABASE_1.
+
+  Rules:
+  - Always resolve the caller to a single user_id before quoting account data.
+  - Treat profile fields (email, loyalty tier, account status) as confidential.
+  - This skill is READ-ONLY. Never request INSERT, UPDATE, or DELETE against
+    the customer database. Identity confirmation is a lookup, not a mutation.
+  - If the profile cannot be found, say so clearly and offer human escalation.
